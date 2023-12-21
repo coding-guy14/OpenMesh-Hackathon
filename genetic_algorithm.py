@@ -30,7 +30,13 @@ Returns:
 """
 def evaluate_prompt(model: GPT2Model, prompt: PromptChromosome, expected_output: str) -> float:
     response = model.predict_sentiment(str(prompt))
-    return 1 if response == expected_output else 0
+    sentiment_score = 1 if response == expected_output else 0
+
+    output_length = len(response.split())
+    word_diversity = len(set(response.split())) / output_length
+
+    final_score = 0.6 * sentiment_score + 0.2 * output_length/50 + 0.2 * word_diversity
+    return final_score
 #endregion
 
 
@@ -44,9 +50,13 @@ Returns:
     PromptChromosome: The offspring chromosome generated after crossover.
 """
 def crossover(parent1: PromptChromosome, parent2: PromptChromosome) -> PromptChromosome:
-    crossover_point = random.randint(1, len(parent1.genes) - 1)
-    new_genes = parent1.genes[:crossover_point] + parent2.genes[crossover_point:]
-    return PromptChromosome(new_genes)
+    if random.random() < 0.5:
+        points = sorted(random.sample(range(len(parent1.genes)), 2))
+        child_genes = parent1.genes[:points[0]] + parent2.genes[points[0]:points[1]] + parent1.genes[points[1]:]
+    else:
+        child_genes = [random.choice([gene1, gene2]) for gene1, gene2 in zip(parent1.genes, parent2.genes)]
+    return PromptChromosome(child_genes)
+
 #endregion
 
 
@@ -59,10 +69,9 @@ Args:
 
 """
 def mutate(chromosome: PromptChromosome, mutation_rate: float) -> None:
-    
-    if random.random() < mutation_rate:
-        mutation_point = random.randint(0, len(chromosome.genes) - 1)
-        chromosome.genes[mutation_point] = "This is a bad day." if chromosome.genes[mutation_point] == "This is a great day." else "This is a great day."
+    for i in range(len(chromosome.genes)):
+        if random.random() < mutation_rate:
+            chromosome.genes[i] = random.choice(chromosome.genes[i].split())
 #endregion
 
 
@@ -97,7 +106,6 @@ class GeneticAlgorithm:
     """
     def select_parents(self) -> Tuple[PromptChromosome, PromptChromosome]:
         return random.sample(self.population, 2)
-
 
     """
     Runs a generation of the genetic algorithm.
