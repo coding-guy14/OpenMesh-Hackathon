@@ -19,3 +19,6 @@ Clone the repository and install the required dependencies:
 ## Usage
 - Main Code -> python3 main.py
 - Test Suite -> python3 tests.py
+
+## NOTE
+- HyperCycle has not been implemented yet
