@@ -20,7 +20,7 @@ class TestGeneticAlgorithm(unittest.TestCase):
     def test_fitness_function(self):
         prompt = genetic_algorithm.PromptChromosome(["Analyze sentiment:", "This is a great day."])
         fitness_score = genetic_algorithm.evaluate_prompt(self.model, prompt, "Positive")
-        self.assertIsInstance(fitness_score, int, "Fitness score is not an integer") 
+        self.assertIsInstance(fitness_score, float, "Fitness score is not an integer") 
 
     
     def test_initial_population(self):
